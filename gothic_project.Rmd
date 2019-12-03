@@ -1,0 +1,325 @@
+---
+title: "Gothic Textual Data"
+author: "Margaret Butler"
+date: "12/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(gutenbergr)
+library(tidyverse)
+library(stringr)
+library(fs)
+library(scales)
+library(lubridate)
+library(dplyr)
+library(knitr)
+library(tibble)
+library(foreign)
+library(readr)
+library(janitor)
+library(tibble)
+library(purrr)
+library(ggplot2)
+library(ggrepel)
+library(tidytext)
+library(tokenizers)
+library(textdata)
+library(wordcloud)
+
+## load packages
+
+```
+## Looking at Gothic Literature
+
+Downloading books I want to look at from the gutenbergr package. Books I am looking at in this are *Frankenstein*, *The Strange Case of Dr. Jekyll and Mr. Hyde*, *Carmilla*, *The Phantom of the Opera*, and *Dracula*.
+
+## Gutenberg Book ID Numbers
+
+1. Frankenstein 84
+2. The Strange Case of Dr. Jekyll and Mr. Hyde 43
+3. Carmilla 10007
+4. The Phantom of the Opera 175
+5. Dracula 345
+
+```{r, inclue=FALSE, message=FALSE}
+
+gothic <- gutenberg_download(c(84, 43, 10007, 175, 345))
+
+frankenstein <- gutenberg_download(84)
+jekyllhyde <- gutenberg_download(43)
+carmilla <- gutenberg_download(10007)
+phantom <- gutenberg_download(175)
+dracula <- gutenberg_download(345)
+
+## downloading the books into one big data set and then into separate data sets
+
+tidy_gothic <- gothic %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+tidy_frankenstein <- frankenstein %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+tidy_jekyllhyde <- jekyllhyde %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+tidy_carmilla <- carmilla %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+tidy_phantom <- phantom %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+tidy_dracula <- dracula %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+## tidying words so I can pick through them at my leisure
+## I am a goofball and realized that the reason I cannot analyze the pronoun usage is because stop_words removes pronouns...
+
+```
+
+```{
+messy_frankenstein <- frankenstein %>%
+  unnest_tokens(word, text)
+
+##frankenstein_sentiment <- messy_frankenstein %>%
+##  inner_join(get_sentiments("bing")) %>%
+##  count(word, sentiment) %>%
+##  spread(sentiment, n, fill = 0) %>%
+##  mutate(sentiment = positive - negative)
+
+frankenstein_sentiment <- tidy_frankenstein %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(sentences, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+ggplot(frankenstein_sentiment, aes(sentences, sentiment)) +
+  geom_col(show.legend = FALSE) 
+  
+  ##facet_wrap(~book, ncol = 2, scales = "free_x")
+
+
+
+ggplot(jekyllhyde_sentiment, aes(word, sentiment)) +
+  geom_col(show.legend = FALSE, color = "red") 
+
+```
+
+Okay, this is a whole mess right now. i want to map pronoun usage and negative sentiment across the books to see if I can track monstrosity, but I genuinely have no idea how to do all of that. So, I am frustrated.
+
+New R chunk so that I dont have to reload the data as I play with it
+
+```{r}
+
+tidy_gothic %>% 
+  count(word, sort = TRUE)
+  
+## checking the most common words across all five texts
+
+```
+
+*The Phantom of the Opera* skews the data because Christine and Raoul are in the top ten most frequent words! Moving on to look at each book individually.
+
+Have just discovered that gutenbergr does not count pronouns or articles in its word count which is tragic because I want to look at pronoun usage!!
+
+```{r}
+
+tidy_frankenstein %>% 
+   count(word, sort = TRUE)
+
+tidy_jekyllhyde %>% 
+  count(word, sort = TRUE)
+
+tidy_carmilla %>% 
+  count(word, sort = TRUE)
+
+tidy_dracula %>% 
+  count(word, sort = TRUE)
+
+tidy_phantom %>% 
+  count(word, sort = TRUE)
+
+```
+
+```{r, sentiment across the novels}
+
+
+sentiment <- get_sentiments("nrc")
+
+tidy_jekyllhyde %>% 
+  inner_join(sentiment)
+
+
+jekyllhyde_sentiment <- tidy_jekyllhyde %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+
+
+
+ggplot(jekyllhyde_sentiment, aes(word, sentiment)) +
+  geom_col(show.legend = FALSE, color = "red") 
+
+##  facet_wrap(~book, ncol = 2, scales = "free_x")
+
+library(wordcloud)
+
+tidy_gothic %>%
+  anti_join(stop_words) %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100))
+
+```
+
+Time is in the top ten for all of them except for in Jekyll and Hyde.
+
+I have also decided to make word clouds depicing the most frequently used words in all of the books. 
+
+```{r}
+
+dir_create("gothic_app")
+
+write_rds(tidy_gothic, "gothic_app/tidy_gothic.rds")
+
+## made dirctory for gothic shiny app and made file to use in said shiny app
+
+```
+
+And in a shocking turn of events that absolutely no one is surprised by, I can't get my shiny app to run and I do not know what I'm doing wrong. Pasting the code down below so my work is at least visible.
+
+## Shiny App Code
+
+library(gutenbergr)
+library(tidytext)
+library(tidyverse)
+library(fs)
+library(shiny)
+library(tidyverse)
+library(shiny)
+library(ggrepel)
+library(datasets)
+library(wordcloud2)
+library(ggplot2)
+library(stringr)
+library(plotly)
+library(shinythemes)
+library(shinyWidgets)
+library(tidytext)
+theme_set(theme_classic())
+
+gothic_whole <- read_rds("tidy_gothic.rds")
+
+
+### Setting Choices for Inputs in the UI 
+
+
+
+sentiment_choices <- c(
+    "Positive" = "positive",
+    "Anticipation" = "anticipation",
+    "Joy" = "joy",
+    "Trust" = "trust",
+    "Sadness" = "sadness",
+    "Surprise" = "surprise",
+    "Anger" = "anger",
+    "Fear" = "fear",
+    "Disgust" = "disgust",
+    "Negative" = "negative"
+)
+
+
+### UI
+
+
+#### Define UI for application that draws a histogram
+ui <- fluidPage(
+    theme = shinytheme("flatly"),
+    
+    navbarPage(
+        "Monstrosity of Language in Gothic Lit",
+        tabPanel(
+            title = "Introduction",
+            h5("By Margaret Butler"),
+            h3("Summary:"),
+            p(
+                "Monstrosity in literature, gothic lit in particular, tends to evoke specific images and draws on a very specific linguistic tradition. I was initially curious about tracking shared word usage and pronoun usage in classic gothic novels that investigate the relationship between humanity and monstrosity."
+            ),
+            p(
+                "Pronouns are used in books such as Mary Shelley's *Frankenstein* to connote a transition from a character's perception as human to monstrous. I was interested in seeing if this was a tradition one could track statistically in other books or if it was even a a traceable trend that five classic examples of monster literature followed."
+            ),
+        ),
+        
+        tabPanel(
+            title = "Most Common Words",
+            h2("The Most Common Words"),
+            p(
+                "This word cloud is based on the most common words across *Frankenstein*, *The Strange Case of Dr. Jekyll and Mr. Hyde*, *The Phantom of the Opera*, *Carmilla*, and *Dracula*."
+            ),
+            sidebarLayout(
+                sidebarPanel(
+                    p(
+                        "Select sentiment."
+                    ),
+                    
+                    # The pickerInput lets the user pick which sentiments they want to be included in the pie chart
+                    # This input is cleaner than check boxer because it collapses like a selectInput but allows you to check multiple similar to checkboxes
+                    
+                    pickerInput(
+                        inputId = "gothic_whole",
+                        label = "Select Which Book",
+                        choices = sentiment_choices,
+                        selected = c("positive", "negative"),
+                        multiple = TRUE
+                    )
+                ),
+                mainPanel(
+                    h2("Word Cloud"),
+                    p(
+                        "Hover to see the word and how many times it was used in every book."
+                    ),
+                    wordcloud2Output("cloud")
+                )
+            )
+        )
+  ))
+
+
+###Server
+
+
+
+
+server <- function(input, output) {
+    output$cloud <- renderWordcloud2({
+        gothic_whole %>%
+            rename(word = Var1) %>%
+            inner_join(get_sentiments("nrc")) %>%
+            filter(sentiment %in% input$multi_sent)
+        
+        # The wordcloud2 function generates the cloud from a data frame with words along with frequency
+        
+        wordcloud2(gothic_whole, size = 2)
+    })
+    
+   
+    
+    
+    
+    
+}
+
+
+shinyApp(ui = ui, server = server)
+
+
+
+
