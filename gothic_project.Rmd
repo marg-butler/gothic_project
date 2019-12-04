@@ -28,6 +28,7 @@ library(tokenizers)
 library(textdata)
 library(wordcloud)
 
+
 ## load packages
 
 ```
@@ -45,7 +46,10 @@ Downloading books I want to look at from the gutenbergr package. Books I am look
 
 ```{r, inclue=FALSE, message=FALSE}
 
-gothic <- gutenberg_download(c(84, 43, 10007, 175, 345))
+gothic <- gutenberg_download(c(84, 43, 10007, 175, 345), meta_fields = "title")
+
+gothic$row_num <- seq.int(nrow(gothic))
+
 
 frankenstein <- gutenberg_download(84)
 jekyllhyde <- gutenberg_download(43)
@@ -54,6 +58,7 @@ phantom <- gutenberg_download(175)
 dracula <- gutenberg_download(345)
 
 ## downloading the books into one big data set and then into separate data sets
+## I discovered later that I did'nt need to download the texts separately but I'm leaving them in here for now
 
 tidy_gothic <- gothic %>%
   unnest_tokens(word, text) %>%
@@ -84,6 +89,11 @@ tidy_dracula <- dracula %>%
 
 ```
 
+```{r}
+
+
+
+```
 ```{
 messy_frankenstein <- frankenstein %>%
   unnest_tokens(word, text)
@@ -150,33 +160,6 @@ tidy_phantom %>%
 
 ```{r, sentiment across the novels}
 
-
-sentiment <- get_sentiments("nrc")
-
-tidy_jekyllhyde %>% 
-  inner_join(sentiment)
-
-
-jekyllhyde_sentiment <- tidy_jekyllhyde %>%
-  inner_join(get_sentiments("bing")) %>%
-  count(word, sentiment) %>%
-  spread(sentiment, n, fill = 0) %>%
-  mutate(sentiment = positive - negative)
-
-
-
-
-ggplot(jekyllhyde_sentiment, aes(word, sentiment)) +
-  geom_col(show.legend = FALSE, color = "red") 
-
-##  facet_wrap(~book, ncol = 2, scales = "free_x")
-
-library(wordcloud)
-
-tidy_gothic %>%
-  anti_join(stop_words) %>%
-  count(word) %>%
-  with(wordcloud(word, n, max.words = 100))
 
 ```
 
