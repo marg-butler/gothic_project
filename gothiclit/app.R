@@ -23,12 +23,14 @@ library(plotly)
 library(shinythemes)
 library(shinyWidgets)
 library(tidytext)
+library(wordcloud)
 theme_set(theme_classic())
 
 
 sentiment_time <- read_rds("sentiment_time.rds")
 tidy_gothic <- read_rds("tidy_gothic.rds")
 messy_gothic <- read_rds("messy_gothic.rds")
+cloud_gothic <- read_rds("cloud_gothic.rds")
 
 
 ### UI
@@ -65,7 +67,7 @@ ui <- fluidPage(
         tabPanel(
            "Sentiment Analysis",
            htmlOutput("sentintro"),
-           selectInput("title", "Novel",
+           selectInput("title", "Select Text:",
                        c("Carmilla" = "Carmilla",
                          "Dracula" = "Dracula",
                          "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
@@ -73,6 +75,28 @@ ui <- fluidPage(
                          "Jekyll and Hyde" = "The Strange Case of Dr. Jekyll and Mr. Hyde"
                          )),
            plotOutput("sentplot")
+        ),
+        tabPanel(
+            "Most Common Words",
+            htmlOutput("comintro"),
+            pickerInput( "novel", "Select Texts:",
+                         c("Carmilla" = "Carmilla",
+                           "Dracula" = "Dracula",
+                           "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
+                           "The Phantom of the Opera" = "The Phantom of the Opera",
+                           "Jekyll and Hyde" = "The Strange Case of Dr. Jekyll and Mr. Hyde"),
+                         selected = "Carmilla",
+                         multiple = TRUE
+                        ),
+            plotOutput("comcloud"),
+            htmlOutput("freqexpl"),
+            selectInput("title", "Novel:",
+                        c("Carmilla" = "Carmilla",
+                        "Dracula" = "Dracula",
+                        "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
+                        "The Phantom of the Opera" = "The Phantom of the Opera",
+                        "Jekyll and Hyde" = "The Strange Case of Dr. Jekyll and Mr. Hyde")
+            )
         )
     ))
 
@@ -98,6 +122,21 @@ server <- function(input, output) {
             ggplot(aes(index, sentiment, fill = sentiment)) +
                 geom_col(show.legend = FALSE)
     })
+    output$comintro <- renderUI({
+        HTML(
+            "The followin wordcloud represents the most frequent or common words in each novel. 
+            The size of the word indicates how frequently it is used."
+        )
+    })
+    output$comcloud <- renderPlot({
+        tidy_gothic %>% 
+            filter(novel == input$novel) %>% 
+            anti_join(stop_words) %>%
+            count(word) %>%
+            with(wordcloud(word, n, max.words = 100))
+    })
+    
+    
 
     
     

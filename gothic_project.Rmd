@@ -156,6 +156,14 @@ tidy_gothic %>%
   count(word) %>%
   with(wordcloud(word, n, max.words = 100))
 
+```
+```{r}
+cloud_gothic <- tidy_gothic %>%
+  mutate(novel <- title)
+
+write_rds(cloud_gothic, "gothiclit/cloud_gothic.rds")
+  
+```
 write_rds(messy_gothic, "gothiclit/messy_gothic.rds")
 
 ```
@@ -168,4 +176,6 @@ write_rds(tidy_gothic, "gothiclit/tidy_gothic.rds")
 ## made dirctory for gothic shiny app and made file to use in said shiny app
 
 ```
+
+There is terrible inconsistency between my rmd and the shiny app. Goes from gothic_project to gothiclit to gothicproject.
 
