@@ -156,6 +156,8 @@ tidy_gothic %>%
   count(word) %>%
   with(wordcloud(word, n, max.words = 100))
 
+write_rds(messy_gothic, "gothiclit/messy_gothic.rds")
+
 ```
 
 ```{r}
