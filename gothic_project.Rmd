@@ -64,6 +64,11 @@ tidy_gothic <- gothic %>%
   unnest_tokens(word, text) %>%
   anti_join(stop_words)
 
+messy_gothic <- gothic %>% 
+  unnest_tokens(word, text)
+
+## need a messy_gothic and a separate tidy_gothic because one includes the pronouns I want to count while the other removes pronouns. I'm looking at both.
+
 tidy_frankenstein <- frankenstein %>%
   unnest_tokens(word, text) %>%
   anti_join(stop_words)
@@ -91,40 +96,22 @@ tidy_dracula <- dracula %>%
 
 ```{r}
 
-
-
-```
-```{
-messy_frankenstein <- frankenstein %>%
-  unnest_tokens(word, text)
-
-##frankenstein_sentiment <- messy_frankenstein %>%
-##  inner_join(get_sentiments("bing")) %>%
-##  count(word, sentiment) %>%
-##  spread(sentiment, n, fill = 0) %>%
-##  mutate(sentiment = positive - negative)
-
-frankenstein_sentiment <- tidy_frankenstein %>%
-  inner_join(get_sentiments("bing")) %>%
-  count(sentences, sentiment) %>%
-  spread(sentiment, n, fill = 0) %>%
+sentiment_time <- tidy_gothic %>% 
+  inner_join(get_sentiments("bing")) %>% 
+  count(title, index = row_num %/% 80, sentiment) %>% 
+  spread(sentiment, n, fill = 0) %>% 
   mutate(sentiment = positive - negative)
 
-ggplot(frankenstein_sentiment, aes(sentences, sentiment)) +
-  geom_col(show.legend = FALSE) 
-  
-  ##facet_wrap(~book, ncol = 2, scales = "free_x")
-
-
-
-ggplot(jekyllhyde_sentiment, aes(word, sentiment)) +
-  geom_col(show.legend = FALSE, color = "red") 
+ggplot(sentiment_time, aes(index, sentiment, fill = title)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~title, ncol = 2, scales = "free_x")
 
 ```
 
-Okay, this is a whole mess right now. i want to map pronoun usage and negative sentiment across the books to see if I can track monstrosity, but I genuinely have no idea how to do all of that. So, I am frustrated.
+These graphs display the change in positive versus negative sentiment of the words as each text progresses
 
-New R chunk so that I dont have to reload the data as I play with it
+I want to map pronoun usage and negative sentiment across the books to see if I can track monstrosity, but I genuinely have no idea how to do all of that. So, I am frustrated.
+
 
 ```{r}
 
@@ -136,8 +123,6 @@ tidy_gothic %>%
 ```
 
 *The Phantom of the Opera* skews the data because Christine and Raoul are in the top ten most frequent words! Moving on to look at each book individually.
-
-Have just discovered that gutenbergr does not count pronouns or articles in its word count which is tragic because I want to look at pronoun usage!!
 
 ```{r}
 
@@ -158,14 +143,12 @@ tidy_phantom %>%
 
 ```
 
-```{r, sentiment across the novels}
-
-
-```
-
 Time is in the top ten for all of them except for in Jekyll and Hyde.
 
-I have also decided to make word clouds depicing the most frequently used words in all of the books. 
+I have also decided to make word clouds depicting the most frequently used words in all of the books. 
+
+```{r word cloud work}
+```
 
 ```{r}
 
