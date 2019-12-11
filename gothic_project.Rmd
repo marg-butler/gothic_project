@@ -146,7 +146,7 @@ tidy_carmilla %>%
 tidy_dracula %>% 
   count(word, sort = TRUE)
 
-## words that are unique to Dracula due to status as names: van, helsing, lucy, mina
+## words that are unique to Dracula due to status as names: van, helsing, lucy, mina, jonathan
 
 tidy_phantom %>% 
   count(word, sort = TRUE)
@@ -168,25 +168,38 @@ no_names <- tidy_gothic %>%
   filter(word != "raoul") %>%
   filter(word != "erik") %>%
   filter(word != "richard") %>%
-  count(word, sort = TRUE)
+  filter(word != "jonathan") %>% 
+  filter(word != "arthur") %>% 
+  filter(word != "de")
 
+## removing de because it is a french part of speech
+```
+Time is in the top ten for all of them except for in Jekyll and Hyde.
+```{r }
+
+neat_no_name <- no_names %>% 
+  mutate(carm = ifelse(title == "Carmilla", "yes", "no")) %>%
+  mutate(drac = ifelse(title == "Dracula", "yes", "no")) %>% 
+  mutate(fran = ifelse(title == "Frankenstein; Or, The Modern Prometheus", "yes", "no")) %>%
+  mutate(phan = ifelse(title == "The Phantom of the Opera", "yes", "no")) %>%
+  mutate(jeky = ifelse(title == "The Strange Case of Dr. Jekyll and Mr. Hyde", "yes", "no")) 
+      
 ```
 
-Time is in the top ten for all of them except for in Jekyll and Hyde.
+
 
 I have also decided to make word clouds depicting the most frequently used words in all of the books. 
 
 ```{r word cloud work}
 
-tidy_gothic %>%
+no_names %>%
   anti_join(stop_words) %>%
   count(word) %>%
-  with(wordcloud(word, n, max.words = 100))
+  with(wordcloud(word, n, max.words = 72))
 
 ```
 ```{r}
-cloud_gothic <- tidy_gothic %>%
-  mutate(novel <- title)
+cloud_gothic <- no_names
 
 write_rds(cloud_gothic, "gothiclit/cloud_gothic.rds")
   

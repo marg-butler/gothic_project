@@ -45,7 +45,7 @@ ui <- fluidPage(
         tabPanel(
             title = "About",
             h5("By Margaret Butler"),
-            h3("Tracking the Monstrous in Five Gothic Novels"),
+            h2("Tracking the Monstrous in Five Gothic Novels"),
             p(
                 "Monstrosity in literature, gothic lit in particular, tends to evoke specific images and draws on a very specific linguistic tradition. 
                 I was initially curious about tracking shared word usage and pronoun usage in classic gothic novels that investigate the relationship between 
@@ -53,7 +53,12 @@ ui <- fluidPage(
             ),
             br(),
             p(
-              "Pronouns are used in books such as Mary Shelley's *Frankenstein* to connote a transition from a character's perception as human to monstrous. 
+              "Pronouns are used in books such as Mary Shelley's "
+              ),
+            em(
+                "Frankenstein"
+               ),
+              (" to connote a transition from a character's perception as human to monstrous. 
               I was interested in seeing if this was a tradition one could track statistically in other books or if it was even a a traceable trend that five 
               classic examples of monster literature followed."
               ),
@@ -62,7 +67,27 @@ ui <- fluidPage(
             "The first few graphics I have give visualization to words trends throughout the novels—more specifically, we get to see a visual representation 
             of what exactly makes these novels “gothic”: the negative sentiment, the specific words used, and so on. This is the springboard into pronoun and 
             monstrosity analysis of the greater question: can looking at word usage analytically help us identify negativity and monstrosity in literature?"
-              )
+              ),
+            br(),
+            h3(
+                "Summaries"
+            ),
+            h4(
+                "Carmilla"
+            ),
+            h4(
+                "Dracula"
+            ),
+            h4(
+              "Frankenstein"  
+            ),
+            h4(
+                "The Phantom of the Opera"
+            ),
+            h4(
+                "The Strange Case of Dr. Jekyll and Mr. Hyde"
+            )
+            
         ),
         tabPanel(
            "Sentiment Analysis",
@@ -79,7 +104,7 @@ ui <- fluidPage(
         tabPanel(
             "Most Common Words",
             htmlOutput("comintro"),
-            pickerInput( "novel", "Select Texts:",
+            pickerInput( "title", "Select Texts:",
                          c("Carmilla" = "Carmilla",
                            "Dracula" = "Dracula",
                            "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
@@ -130,10 +155,10 @@ server <- function(input, output) {
     })
     output$comcloud <- renderPlot({
         tidy_gothic %>% 
-            filter(novel == input$novel) %>% 
+            filter(title == input$title) %>% 
             anti_join(stop_words) %>%
             count(word) %>%
-            with(wordcloud(word, n, max.words = 100))
+            with(wordcloud(word, n, max.words = 72))
     })
     
     
