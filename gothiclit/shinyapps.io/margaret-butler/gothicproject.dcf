@@ -1,0 +1,12 @@
+name: gothicproject
+title: gothicproject
+username:
+account: margaret-butler
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1560007
+bundleId: 2640171
+url: https://margaret-butler.shinyapps.io/gothicproject/
+when: 1575465580.59409
+asMultiple: FALSE
+asStatic: FALSE

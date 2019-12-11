@@ -131,16 +131,43 @@ tidy_gothic %>%
 tidy_frankenstein %>% 
    count(word, sort = TRUE)
 
+## words that are unique to Frankenstein due to status as names: elizabeth
+
 tidy_jekyllhyde %>% 
   count(word, sort = TRUE)
+
+## words that are unique to Jekyll and Hyde due to status as names: poole, utterson, jekyll, hyde
 
 tidy_carmilla %>% 
   count(word, sort = TRUE)
 
+## words that are unique to Carmilla due to status as names: carmilla
+
 tidy_dracula %>% 
   count(word, sort = TRUE)
 
+## words that are unique to Dracula due to status as names: van, helsing, lucy, mina
+
 tidy_phantom %>% 
+  count(word, sort = TRUE)
+
+## words that are unique to Phantom due to status as names: christine, raoul, erik, richard
+
+no_names <- tidy_gothic %>% 
+  filter(word != "elizabeth") %>% 
+  filter(word != "poole") %>% 
+  filter(word != "utterson") %>%
+  filter(word != "jekyll") %>%
+  filter(word != "van") %>%
+  filter(word != "helsing") %>%
+  filter(word != "carmilla") %>%
+  filter(word != "hyde") %>%
+  filter(word != "lucy") %>%
+  filter(word != "mina") %>%
+  filter(word != "christine") %>%
+  filter(word != "raoul") %>%
+  filter(word != "erik") %>%
+  filter(word != "richard") %>%
   count(word, sort = TRUE)
 
 ```
