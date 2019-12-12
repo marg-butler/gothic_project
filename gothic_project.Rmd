@@ -118,9 +118,17 @@ I want to map pronoun usage and negative sentiment across the books to see if I 
 ```{r}
 
 tidy_gothic %>% 
-  count(word, sort = TRUE)
+  count(word, sort = TRUE) 
   
 ## checking the most common words across all five texts
+
+```
+
+Looking for words we associate with monstrosity.
+
+
+
+```{r }
 
 ```
 
@@ -128,32 +136,35 @@ tidy_gothic %>%
 
 ```{r}
 
-tidy_frankenstein %>% 
+tidy_frank <- tidy_frankenstein %>% 
    count(word, sort = TRUE)
 
 ## words that are unique to Frankenstein due to status as names: elizabeth
 
-tidy_jekyllhyde %>% 
+tidy_jek <- tidy_jekyllhyde %>% 
   count(word, sort = TRUE)
 
 ## words that are unique to Jekyll and Hyde due to status as names: poole, utterson, jekyll, hyde
 
-tidy_carmilla %>% 
+tidy_carm <- tidy_carmilla %>% 
   count(word, sort = TRUE)
 
 ## words that are unique to Carmilla due to status as names: carmilla
 
-tidy_dracula %>% 
+tidy_drac <- tidy_dracula %>% 
   count(word, sort = TRUE)
 
 ## words that are unique to Dracula due to status as names: van, helsing, lucy, mina, jonathan
 
-tidy_phantom %>% 
+tidy_phan <- tidy_phantom %>% 
   count(word, sort = TRUE)
 
 ## words that are unique to Phantom due to status as names: christine, raoul, erik, richard
 
-no_names <- tidy_gothic %>% 
+```
+
+```{r}
+no_names <- messy_gothic %>% 
   filter(word != "elizabeth") %>% 
   filter(word != "poole") %>% 
   filter(word != "utterson") %>%
@@ -170,40 +181,35 @@ no_names <- tidy_gothic %>%
   filter(word != "richard") %>%
   filter(word != "jonathan") %>% 
   filter(word != "arthur") %>% 
-  filter(word != "de")
+  filter(word != "de") %>% 
+  filter(word != "karstein") %>% 
+  filter(word != "mircalla") %>% 
+  filter(word != "millarca") %>% 
+  rename(book = title)
 
 ## removing de because it is a french part of speech
 ```
 Time is in the top ten for all of them except for in Jekyll and Hyde.
-```{r }
-
-neat_no_name <- no_names %>% 
-  mutate(carm = ifelse(title == "Carmilla", "yes", "no")) %>%
-  mutate(drac = ifelse(title == "Dracula", "yes", "no")) %>% 
-  mutate(fran = ifelse(title == "Frankenstein; Or, The Modern Prometheus", "yes", "no")) %>%
-  mutate(phan = ifelse(title == "The Phantom of the Opera", "yes", "no")) %>%
-  mutate(jeky = ifelse(title == "The Strange Case of Dr. Jekyll and Mr. Hyde", "yes", "no")) 
-      
-```
-
 
 
 I have also decided to make word clouds depicting the most frequently used words in all of the books. 
 
-```{r word cloud work}
+
 
 no_names %>%
   anti_join(stop_words) %>%
   count(word) %>%
   with(wordcloud(word, n, max.words = 72))
 
-```
-```{r}
-cloud_gothic <- no_names
 
-write_rds(cloud_gothic, "gothiclit/cloud_gothic.rds")
+
+```{r}
+
+cloudish_gothic <- no_names
+
+write_rds(cloudish_gothic, "gothiclit/cloudish_gothic.rds")
   
-```
+
 write_rds(messy_gothic, "gothiclit/messy_gothic.rds")
 
 ```

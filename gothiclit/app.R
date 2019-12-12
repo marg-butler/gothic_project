@@ -30,8 +30,7 @@ theme_set(theme_classic())
 sentiment_time <- read_rds("sentiment_time.rds")
 tidy_gothic <- read_rds("tidy_gothic.rds")
 messy_gothic <- read_rds("messy_gothic.rds")
-cloud_gothic <- read_rds("cloud_gothic.rds")
-
+cloudish_gothic <- read_rds("cloudish_gothic.rds")
 
 ### UI
 
@@ -55,9 +54,7 @@ ui <- fluidPage(
             p(
               "Pronouns are used in books such as Mary Shelley's "
               ),
-            em(
-                "Frankenstein"
-               ),
+            em("Frankenstein"),
               (" to connote a transition from a character's perception as human to monstrous. 
               I was interested in seeing if this was a tradition one could track statistically in other books or if it was even a a traceable trend that five 
               classic examples of monster literature followed."
@@ -69,24 +66,14 @@ ui <- fluidPage(
             monstrosity analysis of the greater question: can looking at word usage analytically help us identify negativity and monstrosity in literature?"
               ),
             br(),
-            h3(
-                "Summaries"
-            ),
-            h4(
-                "Carmilla"
-            ),
-            h4(
-                "Dracula"
-            ),
-            h4(
-              "Frankenstein"  
-            ),
-            h4(
-                "The Phantom of the Opera"
-            ),
-            h4(
-                "The Strange Case of Dr. Jekyll and Mr. Hyde"
-            )
+            h3("Summaries"),
+            h5("Carmilla"),
+            h5("Dracula"),
+            h5("Frankenstein"),
+            h5("The Phantom of the Opera"),
+            h5("The Strange Case of Dr. Jekyll and Mr. Hyde"),
+            br(),
+            h3("About the Author")
             
         ),
         tabPanel(
@@ -104,7 +91,7 @@ ui <- fluidPage(
         tabPanel(
             "Most Common Words",
             htmlOutput("comintro"),
-            pickerInput( "title", "Select Texts:",
+            pickerInput("book", "Select Texts:",
                          c("Carmilla" = "Carmilla",
                            "Dracula" = "Dracula",
                            "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
@@ -154,8 +141,8 @@ server <- function(input, output) {
         )
     })
     output$comcloud <- renderPlot({
-        tidy_gothic %>% 
-            filter(title == input$title) %>% 
+        cloudish_gothic %>% 
+            filter(book == input$book) %>% 
             anti_join(stop_words) %>%
             count(word) %>%
             with(wordcloud(word, n, max.words = 72))
