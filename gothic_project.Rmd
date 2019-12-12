@@ -206,7 +206,56 @@ write_rds(dense_gothic, "gothiclit/dense_gothic.rds")
 ```{r}
 ## tidying data for regression
 
+reg_gothic <- messy_gothic %>% 
+  rename(books = title) %>% 
+  rename(words = word)
+
+write_rds(reg_gothic, "gothiclit/reg_gothic.rds")
+
 ```
+
+```{r}
+
+reg_gothic %>% 
+            filter(words == "time" |
+                    words == "night" |
+                    words == "eyes" |
+                    words == "day" |
+                    words == "door" |
+                    words == "hand" |
+                    words == "dear" |
+                    words == "life" |
+                    words == "found" |
+                    words == "voice" |
+                    words == "he" |
+                    words == "she" |
+                    words == "it" |
+                    words == "creature") %>% 
+  count(books, index = row_num %/% 100, words) %>% 
+            ggplot(aes(index, n, color = words)) +
+            geom_point(alpha = 0.5) +
+            geom_smooth(method = "lm", se = FALSE) +
+            labs(
+                x = "Line",
+                y = "Words"
+            )
+
+## testing my regression to see if I could get it to work
+```
+model_seas <- lm(overall ~ workload + log_n, data = seas_mod)
+
+ggplot(q5_data, aes(workload, overall)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~divisional_distribution) +
+  labs(
+    title = "Student Reported Workloads and Course Evaluations at Harvard",
+    subtitle = "Relationship varies across academic divisions",
+    x = "Average Workload in Hours per Week",
+    y = "Average Student Evaluations"
+  )
+
+
 
 ```{r}
 

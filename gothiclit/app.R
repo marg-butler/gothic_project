@@ -24,6 +24,7 @@ library(shinythemes)
 library(shinyWidgets)
 library(tidytext)
 library(wordcloud)
+library(RColorBrewer)
 theme_set(theme_classic())
 
 
@@ -32,6 +33,7 @@ tidy_gothic <- read_rds("tidy_gothic.rds")
 messy_gothic <- read_rds("messy_gothic.rds")
 cloudish_gothic <- read_rds("cloudish_gothic.rds")
 dense_gothic <- read_rds("dense_gothic.rds")
+reg_gothic <- read_rds("reg_gothic.rds")
 
 ### UI
 
@@ -45,7 +47,7 @@ ui <- fluidPage(
         tabPanel(
             title = "About",
             h5("By Margaret Butler"),
-            h2("Tracking the Monstrous in Five Gothic Novels"),
+            h2("Tracking the Monstrous Across Five Gothic Novels"),
             p(
                 "Monstrosity in literature, gothic lit in particular, tends to evoke specific images and draws on a very specific linguistic tradition. 
                 I was initially curious about tracking shared word usage and pronoun usage in classic gothic novels that investigate the relationship between 
@@ -92,15 +94,49 @@ ui <- fluidPage(
         tabPanel(
             "Most Common Words",
             htmlOutput("comintro"),
-            pickerInput("book", "Select Texts:",
-                         c("Carmilla" = "Carmilla",
-                           "Dracula" = "Dracula",
-                           "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
-                           "The Phantom of the Opera" = "The Phantom of the Opera",
-                           "Jekyll and Hyde" = "The Strange Case of Dr. Jekyll and Mr. Hyde"),
-                         selected = "Carmilla",
-                         multiple = TRUE
-                        )
+            sidebarLayout(
+                sidebarPanel(
+                    checkboxGroupInput("books", "Novel",
+                                       c("Carmilla" = "Carmilla",
+                                         "Dracula" = "Dracula",
+                                         "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
+                                         "The Phantom of the Opera" = "The Phantom of the Opera",
+                                         "Jekyll and Hyde" = "The Strange Case of Dr. Jekyll and Mr. Hyde"),
+                                       selected = c("Carmilla", "Dracula", "Frankenstein; Or, The Modern Prometheus", "The Phantom of the Opera", "The Strange Case of Dr. Jekyll and Mr. Hyde")
+                    ),
+                    checkboxGroupInput("words", "Word",
+                                       c( "time" = "time",
+                                          "night" = "night",
+                                          "eyes" = "eyes",
+                                          "door" = "door",
+                                          "day" = "day",
+                                          "hand" = "hand",
+                                          "dear" = "dear",
+                                          "life" = "life",
+                                          "found" = "found",
+                                          "voice" = "voice",
+                                          "he" = "he",
+                                          "she" = "she",
+                                          "it" = "it",
+                                          "creature" = "creature",
+                                          "monster" = "monster"  
+                                       ),
+                                       selected = c("time", 
+                                                    "night", 
+                                                    "eyes", 
+                                                    "day", 
+                                                    "door",
+                                                    "hand",
+                                                    "dear",
+                                                    "life",
+                                                    "found",
+                                                    "voice")
+                    )  
+                ),
+                mainPanel(
+                    plotOutput("regrplot")
+                )
+            )
         ),
         tabPanel(
             "Monstrosity",
@@ -116,7 +152,8 @@ ui <- fluidPage(
                                        c("time" = "time",
                                          "night" = "night",
                                          "eyes" = "eyes",
-                                         "door" = "day",
+                                         "door" = "door",
+                                         "day" = "day",
                                          "hand" = "hand",
                                          "dear" = "dear",
                                          "life" = "life",
@@ -155,10 +192,10 @@ server <- function(input, output) {
     output$sentplot <- renderPlot({
         sentiment_time %>% 
             filter(title == input$title) %>% 
-            ggplot(aes(index, sentiment, fill = positive)) +
+            ggplot(aes(index, sentiment, fill = sentiment)) +
                 geom_col(show.legend = FALSE) +
                 labs(x = "Pages",
-                     y = "Positive Over Negative Sentiment") 
+                     y = "Positive Over Negative Sentiment")
     })
     output$comintro <- renderUI({
         HTML(
@@ -166,12 +203,32 @@ server <- function(input, output) {
             The size of the word indicates how frequently it is used."
         )
     })
-    output$comcloud <- renderPlot({
-        cloudish_gothic %>% 
-            filter(book == input$book) %>% 
-            anti_join(stop_words) %>%
-            count(word) %>%
-            with(wordcloud(word, n, max.words = 72))
+    output$regrplot <- renderPlot({
+        reg_gothic %>% 
+            filter(books == input$books) %>% 
+            filter(words == input$words) %>% 
+            filter(words == "time" |
+                    words == "night" |
+                    words == "eyes" |
+                    words == "day" |
+                    words == "door" |
+                    words == "hand" |
+                    words == "dear" |
+                    words == "life" |
+                    words == "found" |
+                    words == "voice" |
+                    words == "he" |
+                    words == "she" |
+                    words == "it" |
+                    words == "creature") %>% 
+            count(books, index = row_num %/% 100, words) %>% 
+            ggplot(aes(index, n, color = words)) +
+            geom_point(alpha = 0.5) +
+            geom_smooth(method = "lm", se = FALSE) +
+            labs(
+                x = "Line",
+                y = "Frequency of Words"
+            )
     })
     output$densplot <- renderPlot({
         dense_gothic %>% 
@@ -181,6 +238,7 @@ server <- function(input, output) {
                        word == "night" |
                        word == "eyes" |
                        word == "day" |
+                       word == "door" |
                        word == "hand" |
                        word == "dear" |
                        word == "life" |
