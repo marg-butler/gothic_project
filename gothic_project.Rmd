@@ -191,17 +191,22 @@ no_names <- messy_gothic %>%
 ```
 Time is in the top ten for all of them except for in Jekyll and Hyde.
 
+Going to display tables depicting the most common words throughout each novel.
+```{r}
+## tidying data set for density plot that will look at most common words as well as pronouns
 
-I have also decided to make word clouds depicting the most frequently used words in all of the books. 
+dense_gothic <- messy_gothic %>% 
+  rename(novel = title) %>% 
+  count(novel, index = row_num %/% 100, word)
 
+write_rds(dense_gothic, "gothiclit/dense_gothic.rds")
 
+```
 
-no_names %>%
-  anti_join(stop_words) %>%
-  count(word) %>%
-  with(wordcloud(word, n, max.words = 72))
+```{r}
+## tidying data for regression
 
-
+```
 
 ```{r}
 

@@ -31,13 +31,14 @@ sentiment_time <- read_rds("sentiment_time.rds")
 tidy_gothic <- read_rds("tidy_gothic.rds")
 messy_gothic <- read_rds("messy_gothic.rds")
 cloudish_gothic <- read_rds("cloudish_gothic.rds")
+dense_gothic <- read_rds("dense_gothic.rds")
 
 ### UI
 
 
 #### Define UI for application that draws a histogram
 ui <- fluidPage(
-    theme = shinytheme("flatly"),
+    theme = shinytheme("slate"),
     
     navbarPage(
         "Gothic Literature and Monstrosity",
@@ -99,15 +100,38 @@ ui <- fluidPage(
                            "Jekyll and Hyde" = "The Strange Case of Dr. Jekyll and Mr. Hyde"),
                          selected = "Carmilla",
                          multiple = TRUE
-                        ),
-            plotOutput("comcloud"),
-            htmlOutput("freqexpl"),
-            selectInput("title", "Novel:",
-                        c("Carmilla" = "Carmilla",
-                        "Dracula" = "Dracula",
-                        "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
-                        "The Phantom of the Opera" = "The Phantom of the Opera",
-                        "Jekyll and Hyde" = "The Strange Case of Dr. Jekyll and Mr. Hyde")
+                        )
+        ),
+        tabPanel(
+            "Monstrosity",
+            sidebarLayout(
+                sidebarPanel(
+                    selectInput("novel", "Novel",
+                                c("Carmilla" = "Carmilla",
+                                  "Dracula" = "Dracula",
+                                  "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
+                                  "The Phantom of the Opera" = "The Phantom of the Opera",
+                                  "Jekyll and Hyde" = "The Strange Case of Dr. Jekyll and Mr. Hyde")),
+                    checkboxGroupInput("word", "Word:",
+                                       c("time" = "time",
+                                         "night" = "night",
+                                         "eyes" = "eyes",
+                                         "door" = "day",
+                                         "hand" = "hand",
+                                         "dear" = "dear",
+                                         "life" = "life",
+                                         "found" = "found",
+                                         "voice" = "voice",
+                                         "he" = "he",
+                                         "she" = "she",
+                                         "it" = "it",
+                                         "creature" = "creature",
+                                         "monster" = "monster"),
+                                       selected = "time")
+                ),
+                mainPanel(
+                    plotOutput("densplot")
+                )
             )
         )
     ))
@@ -131,8 +155,10 @@ server <- function(input, output) {
     output$sentplot <- renderPlot({
         sentiment_time %>% 
             filter(title == input$title) %>% 
-            ggplot(aes(index, sentiment, fill = sentiment)) +
-                geom_col(show.legend = FALSE)
+            ggplot(aes(index, sentiment, fill = positive)) +
+                geom_col(show.legend = FALSE) +
+                labs(x = "Pages",
+                     y = "Positive Over Negative Sentiment") 
     })
     output$comintro <- renderUI({
         HTML(
@@ -146,6 +172,27 @@ server <- function(input, output) {
             anti_join(stop_words) %>%
             count(word) %>%
             with(wordcloud(word, n, max.words = 72))
+    })
+    output$densplot <- renderPlot({
+        dense_gothic %>% 
+            filter(novel == input$novel) %>% 
+            filter(word == input$word) %>%
+            filter(word == "time" |
+                       word == "night" |
+                       word == "eyes" |
+                       word == "day" |
+                       word == "hand" |
+                       word == "dear" |
+                       word == "life" |
+                       word == "found" |
+                       word == "voice" |
+                       word == "he" |
+                       word == "she" |
+                       word == "it" |
+                       word == "creature"
+            ) %>% 
+            ggplot(aes(x = index, group = word, fill = word)) +
+            geom_density(adjust=1.5, alpha=.4)
     })
     
     
