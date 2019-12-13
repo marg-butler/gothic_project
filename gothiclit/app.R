@@ -103,7 +103,7 @@ ui <- fluidPage(
            "Sentiment Analysis",
            h1("Sentiment Analysis"),
            htmlOutput("sentintro"),
-           selectInput("title", "Select Text:",
+           selectInput("title", "Novel",
                        c("Carmilla" = "Carmilla",
                          "Dracula" = "Dracula",
                          "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
@@ -148,7 +148,11 @@ ui <- fluidPage(
                 mainPanel(
                     plotOutput("densplot")
                 )
-            )
+            ),
+            p("I recommend looking at the top ten words separately from the pronouns. 
+              To get the arc of what I was trying to investigate with pronouns, please 
+              look at he, she, it, and monster across the novels. For Carmilla, I recommend 
+              checking she alone, as the monster we are interested in is female.")
         ),
         tabPanel(
             "Regression",
@@ -197,7 +201,11 @@ ui <- fluidPage(
                 mainPanel(
                     plotOutput("regrplot")
                 )
-            )
+            ),
+            p("I recommend looking at the top ten words separately from the pronouns. 
+              To get the arc of what I was trying to investigate with pronouns, please 
+              look at he, she, it, and monster across the novels. For Carmilla, I recommend 
+              checking she alone, as the monster we are interested in is female.")
         )
     ))
 
@@ -236,7 +244,7 @@ coffin at the Karnstein manor, surrounded with blood. She is swiftly beheaded, a
             and bears the signs of a vampire bite. Van Helsing is summoned to assist, and when Lucy succumbs to death and becomes a vampire, 
             he leads the others to stake her, behead her, and stuff her mouth with garlic. Mina goes to Budapest when Jonathan arrives there 
             half mad. The two return married to try and assist with the Dracula problem. While trying to locate all the coffins of dirt, 
-            Dracula preys upn Mina who begins changing. Van Helsing goes back to Transylvania to eradicate Dracula and his castle for good.<p>"
+            Dracula preys upon Mina who begins changing. Van Helsing goes back to Transylvania to eradicate Dracula and his castle for good.<p>"
         )
     })
     output$fransum <- renderUI({
@@ -285,11 +293,15 @@ coffin at the Karnstein manor, surrounded with blood. She is swiftly beheaded, a
     })
     output$sentintro <- renderUI({
         HTML(
-            "The following graphics represent positive over negative sentiment throughout the course of each book. 
+            "<p>The following graphics represent positive over negative sentiment throughout the course of each book. 
             As you can see if you poke around, sentiment in all the texts is overwhelmingly negative. This tracks 
             with what one expects of gothic literature; in stories about death and monstrosity, negative sentiment 
             really ought to be dominant. The question that emerges of this is: are books that have more negative 
-            sentiment more monstrous?"
+            sentiment more monstrous?<p>
+            <br>
+            <p>Note: The way sentiment is tabulated is by comparing the overall positive versus negative words over roughly 
+            every 100 lines. On its own, this does not necessarily mean that the tone of these are overall positive or negative. 
+            The arc of the novels would suggest that this is a fairly accurate representation of the course of sentiment<p>"
         )
     })
     output$sentplot <- renderPlot({
@@ -353,7 +365,11 @@ coffin at the Karnstein manor, surrounded with blood. She is swiftly beheaded, a
                        word == "creature"
             ) %>% 
             ggplot(aes(x = index, group = word, fill = word)) +
-            geom_density(adjust=1.5, alpha=.4)
+            geom_density(adjust=1.5, alpha=.4) +
+            labs(
+                x = "Pages",
+                y = "Frequency of Words"
+            )
     })
     
     
