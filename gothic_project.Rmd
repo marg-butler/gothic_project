@@ -258,8 +258,9 @@ write_rds(messy_gothic, "gothiclit/messy_gothic.rds")
 
 write_rds(tidy_gothic, "gothiclit/tidy_gothic.rds")
 
+dir.create("gothiclit/www")
 
-## made dirctory for gothic shiny app and made file to use in said shiny app
+## made directory for gothic shiny app and made file to use in said shiny app
 
 ```
 

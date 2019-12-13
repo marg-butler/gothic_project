@@ -55,19 +55,39 @@ ui <- fluidPage(
                 in many of the texts. This project sprung from a desire to see if that shift was traceable."
             ),
             br(),
-            h2("Synopses of the Five Books"),
             p(
               "The focus has shifted from looking primarily at pronoun usage to centering on the words authors use to signal gothic themes and monstrosity. 
               The pages that follow include my attempts to investigate the individual words that the authors use and see if there is a similar pattern 
               among the most frequently used words in each novel. Would such a pattern say anything about the works’ gothicism? Can looking at word usage 
               analytically help us identify negativity and monstrosity in literature?"
               ),
+            h2("Unfamiliar with the Books? Start Here"),
             tabsetPanel(type = "tabs",
-                        tabPanel("Carmilla", htmlOutput("carmsum")),
-                        tabPanel("Dracula", htmlOutput("dracsum")),
-                        tabPanel("Frankenstein", htmlOutput("fransum")),
-                        tabPanel("Phantom", htmlOutput("phansum")),
-                        tabPanel("Jekyll & Hyde", htmlOutput("jeksum"))
+                        tabPanel("Carmilla", 
+                                 sidebarLayout(
+                                     sidebarPanel(img(src = "Carmilla.png", height = 350, width = 200)),
+                                     mainPanel(htmlOutput("carmsum")))
+                                 ),
+                        tabPanel("Dracula", 
+                                 sidebarLayout(
+                                     sidebarPanel(img(src = "Dracula.png", height = 350, width = 200)),
+                                     mainPanel(htmlOutput("dracsum")))
+                                 ),
+                        tabPanel("Frankenstein", 
+                                 sidebarLayout(
+                                     sidebarPanel(img(src = "frankenstein.png", height = 350, width = 200)),
+                                     mainPanel(htmlOutput("fransum")))
+                                 ),
+                        tabPanel("Phantom", 
+                                 sidebarLayout(
+                                     sidebarPanel(img(src = "Phantom.png", height = 350, width = 200)),
+                                     mainPanel(htmlOutput("phansum")))
+                                 ),
+                        tabPanel("Jekyll & Hyde", 
+                                 sidebarLayout(
+                                     sidebarPanel(img(src = "jekyll.png", height = 350, width = 200)),
+                                     mainPanel(htmlOutput("jeksum")))
+                        )
             ),
             br(),
             h3("About the Author and the Sources"),
@@ -81,6 +101,7 @@ ui <- fluidPage(
         ),
         tabPanel(
            "Sentiment Analysis",
+           h1("Sentiment Analysis"),
            htmlOutput("sentintro"),
            selectInput("title", "Select Text:",
                        c("Carmilla" = "Carmilla",
@@ -92,8 +113,48 @@ ui <- fluidPage(
            plotOutput("sentplot")
         ),
         tabPanel(
-            "Most Common Words",
+            "Word Frequency",
+            h1("Word Density"),
+            p("The following plot tracks the frequency of the top ten most common words throughout the course of each novel.
+              It also maps the use of the pronouns he, she, and it, which have been included alongside the words monster and 
+              creature in an effort to locate a correlation between pronoun usage and monstrosity."),
+            br(),
+            sidebarLayout(
+                sidebarPanel(
+                    selectInput("novel", "Novel",
+                                c("Carmilla" = "Carmilla",
+                                  "Dracula" = "Dracula",
+                                  "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
+                                  "The Phantom of the Opera" = "The Phantom of the Opera",
+                                  "Jekyll and Hyde" = "The Strange Case of Dr. Jekyll and Mr. Hyde")),
+                    checkboxGroupInput("word", "Word:",
+                                       c("time" = "time",
+                                         "night" = "night",
+                                         "eyes" = "eyes",
+                                         "door" = "door",
+                                         "day" = "day",
+                                         "hand" = "hand",
+                                         "dear" = "dear",
+                                         "life" = "life",
+                                         "found" = "found",
+                                         "voice" = "voice",
+                                         "he" = "he",
+                                         "she" = "she",
+                                         "it" = "it",
+                                         "creature" = "creature",
+                                         "monster" = "monster"),
+                                       selected = "time")
+                ),
+                mainPanel(
+                    plotOutput("densplot")
+                )
+            )
+        ),
+        tabPanel(
+            "Regression",
+            h1("Linear Regression"),
             htmlOutput("comintro"),
+            br(),
             sidebarLayout(
                 sidebarPanel(
                     checkboxGroupInput("books", "Novel",
@@ -137,39 +198,6 @@ ui <- fluidPage(
                     plotOutput("regrplot")
                 )
             )
-        ),
-        tabPanel(
-            "Word Frequency",
-            sidebarLayout(
-                sidebarPanel(
-                    selectInput("novel", "Novel",
-                                c("Carmilla" = "Carmilla",
-                                  "Dracula" = "Dracula",
-                                  "Frankenstein" = "Frankenstein; Or, The Modern Prometheus",
-                                  "The Phantom of the Opera" = "The Phantom of the Opera",
-                                  "Jekyll and Hyde" = "The Strange Case of Dr. Jekyll and Mr. Hyde")),
-                    checkboxGroupInput("word", "Word:",
-                                       c("time" = "time",
-                                         "night" = "night",
-                                         "eyes" = "eyes",
-                                         "door" = "door",
-                                         "day" = "day",
-                                         "hand" = "hand",
-                                         "dear" = "dear",
-                                         "life" = "life",
-                                         "found" = "found",
-                                         "voice" = "voice",
-                                         "he" = "he",
-                                         "she" = "she",
-                                         "it" = "it",
-                                         "creature" = "creature",
-                                         "monster" = "monster"),
-                                       selected = "time")
-                ),
-                mainPanel(
-                    plotOutput("densplot")
-                )
-            )
         )
     ))
 
@@ -182,27 +210,77 @@ ui <- fluidPage(
 server <- function(input, output) {
     output$carmsum <- renderUI({
         HTML(
-            "Laura"
+            "<h2><em>Carmilla</em></h2>
+<h3>Author: Sheridan Le Fanu</h3>
+<p>The work is presented as part of the casenotes of a Doctor Hesselius. The story follows Laura, a pretty but isolated young 
+woman who lives with her widowed father in a manner. One day, a woman knocks on their door claiming her carriage has broken down 
+and begs admittance into the house for her sickly daughter Carmilla, who cannot travel with her because she needs haste. Laura 
+and her father take Carmilla in, and Laura and Carmilla become very close despite the guests odd habits. Carmilla sleeps most of 
+the day, does not seem to eat, and is terribly pale. While she resides at their manor, Laura’s health deteriorates and she develops 
+vivid nightmares. When a doctor is summoned and a family friend comes to visit, it is revealed that Laura is being prayed on by a 
+vampire, none other than the thought to be deceased Countess Mircalla Karnstein. The vampire has gone around and preyed on young 
+women in the years since her turning all under anagrams of her own name. Carmilla is discovered during the day lying in her own 
+coffin at the Karnstein manor, surrounded with blood. She is swiftly beheaded, and Laura is saved.</p><br>
+<p>Le Fanu’s tale is one of the first vampire tales, and predates Stoker’s <em>Dracula</em>. Sadly, this shorter tale is lesser known.</p>
+"
         )
     })
     output$dracsum <- renderUI({
         HTML(
-            "Jonathan Harker"
+            "<h2><em>Dracula</em></h2>
+            <h3>Author: Bram Stoker</h3>
+            <p>Jonathan Harker goes to Transylvania to help Count Dracula finalize his plans to move to England despite warnings from the 
+            native Transylvanians. When Harker realizes he is trapped in the castle and that Dracula himself is a supernatural being, he 
+            attempts to escape. Ine England, Harker’s fiancee Mina corresponds with friend Lucy at the same time that a ship wrecks on the 
+            coast of England carrying only several coffins of wood from Dracula’s castle and a wolf that runs off into town. Lucy becomes ill 
+            and bears the signs of a vampire bite. Van Helsing is summoned to assist, and when Lucy succumbs to death and becomes a vampire, 
+            he leads the others to stake her, behead her, and stuff her mouth with garlic. Mina goes to Budapest when Jonathan arrives there 
+            half mad. The two return married to try and assist with the Dracula problem. While trying to locate all the coffins of dirt, 
+            Dracula preys upn Mina who begins changing. Van Helsing goes back to Transylvania to eradicate Dracula and his castle for good.<p>"
         )
     })
     output$fransum <- renderUI({
         HTML(
-            "Vicktor Frankenstein"
+            "<h2><em>Frankenstein</em></h2>
+            <h3>Author: Mary Shelley</h3>
+            <p>Robert Walden is a captain on an arctic exploration when his ship becomes stuck in ice. A half frozen man stumbles upon them and 
+            tells Walden his story. Victor Frankenstein lives a charmed life before waltzing off to the University of Ingolstadt to study. After 
+            the death of his mother, he becomes fascinated with death, and seeks to overcome it. Using the techniques of long dead alchemists, 
+            Frankenstein spends his time at university trying to create life. When he succeeds, he is horrified because the creature he had built 
+            to be beautiful is ugly. He faints and runs away. His creature runs out into the unknown. Frankenstein’s best friend comes to visit, 
+            and they go home together. There, Frankenstein encounters the creature after his own creation kills his younger brother. The creature 
+            demands that Frankenstein builds him a companion. Frankenstein finds and island and a hut to do so in, but in a fit of rage and fear, 
+            destroys the bride he is creating. His creature swears vengeance, and when Frankenstein marries his adopted sister Elizabeth, the 
+            creature kills her on their wedding night. Frankenstein spends the rest of his life chasing the creature before dying on a ship in 
+            the Arctic. The creature carries him off into the ice.<p>"
         )
     })
     output$phansum <- renderUI({
         HTML(
-            "Christine Daae"
+            "<h2><em>The Phantom of the Opera</em></h2>
+            <h3>Author: Gaston Leroux</h3>
+            <p>New managers buy the Paris Opera House and quickly discover that it is haunted by the Opera Ghost. Christine Daae, a young dancer, 
+            shows her prowess in singing when the lead soprano is sick. Childhood lover and Viscount de Chagny, Raoul sees her and falls in love 
+            with her all over again, when he tries to get closer to her, he is rebuffed due to the interference of what Christine calls the Angel 
+            of Music. Meanwhile opera owners are running into trouble as they keep trying to slight and ignore the phantom. When his box is sold 
+            during a show, the phantom brings the chandelier down. Raoul and Christine both discover that the phantom is actually a man who has a 
+            face like death living beneath the opera house. The phantom, or Erik, is in love with Christine, and after trapping Raoul in a torture 
+            chamber, tells Christine she must either marry the Phantom or sentence Raoul to death. She chooses the Phantom, but Erik sees how much 
+            the two love each other and lets them go. Erik, Christine, and Raoul disappear.<p>"
         )
     })
     output$jeksum <- renderUI({
         HTML(
-            "John Utterson"
+            "<h2><em>The Strange Case of Dr. Jekyll and Mr. Hyde</em></h2>
+            <h3>Author: Robert Louis Stevenson</h3>
+            <p>John Utterson is perplexed by his friend Dr. Henry Jekyll’s will, which states that if he dies or goes missing, his entire estate
+            is to pass to an unknown Mr. Edward Hyde. Utterson goes looking for Hyde and discovers that he is a horrible person despite his manners. 
+            Believing his friend is being blackmailed, Utterson tries to figure out what jekyll’s connection to Hyde is. He drops the matter when 
+            nothing turns up until Hyde commits a murder. At the same time, Jekyll stops leaving his house or even seeing friends. One night Jekyll’s 
+            butler gets Utterson to come over, saying that the man in his master’s room is not Jekyll, but Hyde. They burst into the room to find Hyde 
+            dead, no Jekyll, and three documents addressed to Utterson. They recount the story of how Jekyll turned into Hyde in order to express his 
+            more deplorable inclinations. Hyde overtook Jekyll in the end, and killed himself to escape the imprisonment that he would have faced when 
+            Utterson found him.<p>"
         )
     })
     output$sentintro <- renderUI({
@@ -225,7 +303,7 @@ server <- function(input, output) {
     })
     output$comintro <- renderUI({
         HTML(
-            "The following regression traces the frequency of the top ten most frequent words across all five novels as well as the pronouns he, she, and it, and the words creature and monster."
+            "The following regressions trace the frequency of the top ten most frequent words across all five novels as well as the pronouns he, she, and it, and the words creature and monster."
         )
     })
     output$regrplot <- renderPlot({
