@@ -25,6 +25,7 @@ library(shinyWidgets)
 library(tidytext)
 library(wordcloud)
 library(RColorBrewer)
+library(vembedr)
 
 
 
@@ -205,7 +206,8 @@ ui <- fluidPage(
             p("I recommend looking at the top ten words separately from the pronouns. 
               To get the arc of what I was trying to investigate with pronouns, please 
               look at he, she, it, and monster across the novels. For Carmilla, I recommend 
-              checking she alone, as the monster we are interested in is female.")
+              checking she alone, as the monster we are interested in is female."),
+            embed_url("https://www.youtube.com/watch?v=44JaAgFiH2U&feature=youtu.be")
         )
     ))
 
