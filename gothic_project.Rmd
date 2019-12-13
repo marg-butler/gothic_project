@@ -242,20 +242,6 @@ reg_gothic %>%
 
 ## testing my regression to see if I could get it to work
 ```
-model_seas <- lm(overall ~ workload + log_n, data = seas_mod)
-
-ggplot(q5_data, aes(workload, overall)) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(method = "lm", se = FALSE) +
-  facet_wrap(~divisional_distribution) +
-  labs(
-    title = "Student Reported Workloads and Course Evaluations at Harvard",
-    subtitle = "Relationship varies across academic divisions",
-    x = "Average Workload in Hours per Week",
-    y = "Average Student Evaluations"
-  )
-
-
 
 ```{r}
 

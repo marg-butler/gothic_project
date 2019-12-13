@@ -25,7 +25,7 @@ library(shinyWidgets)
 library(tidytext)
 library(wordcloud)
 library(RColorBrewer)
-theme_set(theme_classic())
+
 
 
 sentiment_time <- read_rds("sentiment_time.rds")
@@ -46,37 +46,37 @@ ui <- fluidPage(
         "Gothic Literature and Monstrosity",
         tabPanel(
             title = "About",
-            h5("By Margaret Butler"),
             h2("Tracking the Monstrous Across Five Gothic Novels"),
             p(
-                "Monstrosity in literature, gothic lit in particular, tends to evoke specific images and draws on a very specific linguistic tradition. 
-                I was initially curious about tracking shared word usage and pronoun usage in classic gothic novels that investigate the relationship between 
-                humanity and monstrosity."
+                "Monstrosity in literature, gothic lit in particular, tends to evoke very specific images. As an avid reader of horror literature, 
+                I wanted to look at text and word usage in some classic gothic literature texts. I chose five different gothic lit books to analyze 
+                the word and pronoun usage within after asking the question: how do these books use language to define monstrosity? The pronoun 
+                question stems from an observed shift in pronoun usage from he or she to it when the true nature of the creature or monster is revealed 
+                in many of the texts. This project sprung from a desire to see if that shift was traceable."
             ),
             br(),
+            h2("Synopses of the Five Books"),
             p(
-              "Pronouns are used in books such as Mary Shelley's "
+              "The focus has shifted from looking primarily at pronoun usage to centering on the words authors use to signal gothic themes and monstrosity. 
+              The pages that follow include my attempts to investigate the individual words that the authors use and see if there is a similar pattern 
+              among the most frequently used words in each novel. Would such a pattern say anything about the works’ gothicism? Can looking at word usage 
+              analytically help us identify negativity and monstrosity in literature?"
               ),
-            em("Frankenstein"),
-              (" to connote a transition from a character's perception as human to monstrous. 
-              I was interested in seeing if this was a tradition one could track statistically in other books or if it was even a a traceable trend that five 
-              classic examples of monster literature followed."
-              ),
+            tabsetPanel(type = "tabs",
+                        tabPanel("Carmilla", htmlOutput("carmsum")),
+                        tabPanel("Dracula", htmlOutput("dracsum")),
+                        tabPanel("Frankenstein", htmlOutput("fransum")),
+                        tabPanel("Phantom", htmlOutput("phansum")),
+                        tabPanel("Jekyll & Hyde", htmlOutput("jeksum"))
+            ),
             br(),
+            h3("About the Author and the Sources"),
             p(
-            "The first few graphics I have give visualization to words trends throughout the novels—more specifically, we get to see a visual representation 
-            of what exactly makes these novels “gothic”: the negative sentiment, the specific words used, and so on. This is the springboard into pronoun and 
-            monstrosity analysis of the greater question: can looking at word usage analytically help us identify negativity and monstrosity in literature?"
-              ),
-            br(),
-            h3("Summaries"),
-            h5("Carmilla"),
-            h5("Dracula"),
-            h5("Frankenstein"),
-            h5("The Phantom of the Opera"),
-            h5("The Strange Case of Dr. Jekyll and Mr. Hyde"),
-            br(),
-            h3("About the Author")
+                "Hello, friends. My name is Margaret Butler, and I am an undergraduate at Harvard pursuing a joint concentration in English and the Comparative Study of Religion. 
+                This project was completed for the Fall 2019 iteration of Gov 1005. While I’m reluctant to consider myself even a junior data scientist, I have enjoyed mixing data 
+                science with one of my favorite areas of literature. The data from this project comes largely from Project Gutenberg, though I would be remiss if I did not thank the 
+                authors of the texts themselves."
+            )
             
         ),
         tabPanel(
@@ -139,7 +139,7 @@ ui <- fluidPage(
             )
         ),
         tabPanel(
-            "Monstrosity",
+            "Word Frequency",
             sidebarLayout(
                 sidebarPanel(
                     selectInput("novel", "Novel",
@@ -180,6 +180,31 @@ ui <- fluidPage(
 
 
 server <- function(input, output) {
+    output$carmsum <- renderUI({
+        HTML(
+            "Laura"
+        )
+    })
+    output$dracsum <- renderUI({
+        HTML(
+            "Jonathan Harker"
+        )
+    })
+    output$fransum <- renderUI({
+        HTML(
+            "Vicktor Frankenstein"
+        )
+    })
+    output$phansum <- renderUI({
+        HTML(
+            "Christine Daae"
+        )
+    })
+    output$jeksum <- renderUI({
+        HTML(
+            "John Utterson"
+        )
+    })
     output$sentintro <- renderUI({
         HTML(
             "The following graphics represent positive over negative sentiment throughout the course of each book. 
@@ -192,15 +217,15 @@ server <- function(input, output) {
     output$sentplot <- renderPlot({
         sentiment_time %>% 
             filter(title == input$title) %>% 
-            ggplot(aes(index, sentiment, fill = sentiment)) +
+            ggplot(aes(index, sentiment, fill = ifelse(sentiment < 0,'green','red'))) +
                 geom_col(show.legend = FALSE) +
-                labs(x = "Pages",
+                labs(title = "Positive v. Negative Sentiment Over the Course of the Novel",
+                    x = "Pages",
                      y = "Positive Over Negative Sentiment")
     })
     output$comintro <- renderUI({
         HTML(
-            "The followin wordcloud represents the most frequent or common words in each novel. 
-            The size of the word indicates how frequently it is used."
+            "The following regression traces the frequency of the top ten most frequent words across all five novels as well as the pronouns he, she, and it, and the words creature and monster."
         )
     })
     output$regrplot <- renderPlot({
